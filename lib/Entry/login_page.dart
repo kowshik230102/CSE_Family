@@ -17,7 +17,7 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.lightBlue[100],
+      backgroundColor: Colors.lightBlue[1000],
       body: Center(
         child: Container(
           width: 350,
@@ -29,7 +29,8 @@ class _LoginPageState extends State<LoginPage> {
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Icon(Icons.local_fire_department, color: Colors.orange, size: 40),
+                Icon(Icons.local_fire_department,
+                    color: Colors.orange, size: 40),
                 SizedBox(height: 20),
                 Text('Login', style: headerTextStyle()),
                 SizedBox(height: 20),
@@ -54,7 +55,8 @@ class _LoginPageState extends State<LoginPage> {
                       onTap: () => navigateToForgotPassword(context),
                       child: Text(
                         'Forgot password?',
-                        style: TextStyle(color: Colors.orange, fontWeight: FontWeight.bold),
+                        style: TextStyle(
+                            color: Colors.orange, fontWeight: FontWeight.bold),
                       ),
                     ),
                   ],
@@ -72,7 +74,9 @@ class _LoginPageState extends State<LoginPage> {
                         children: [
                           TextSpan(
                             text: "Sign Up",
-                            style: TextStyle(color: Colors.orange, fontWeight: FontWeight.bold),
+                            style: TextStyle(
+                                color: Colors.orange,
+                                fontWeight: FontWeight.bold),
                           ),
                         ],
                       ),
@@ -88,10 +92,12 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   void navigateToForgotPassword(BuildContext context) {
-    Navigator.push(context, MaterialPageRoute(builder: (context) => ForgotPasswordPage()));
+    Navigator.push(
+        context, MaterialPageRoute(builder: (context) => ForgotPasswordPage()));
   }
 
   void navigateToSignUp(BuildContext context) {
-    Navigator.push(context, MaterialPageRoute(builder: (context) => SignUpPage()));
+    Navigator.push(
+        context, MaterialPageRoute(builder: (context) => SignUpPage()));
   }
 }
