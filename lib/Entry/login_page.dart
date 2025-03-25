@@ -1,4 +1,5 @@
 import 'package:csefamily/Entry/widgets.dart';
+import 'package:csefamily/Home_Screen/HomePage.dart';
 import 'package:flutter/material.dart';
 import 'signup_page.dart';
 import 'forgot_password_page.dart';
@@ -7,7 +8,6 @@ class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
 
   @override
-  // ignore: library_private_types_in_public_api
   _LoginPageState createState() => _LoginPageState();
 }
 
@@ -17,7 +17,7 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.lightBlue[1000],
+      backgroundColor: Colors.lightBlue[100],
       body: Center(
         child: Container(
           width: 350,
@@ -62,7 +62,7 @@ class _LoginPageState extends State<LoginPage> {
                   ],
                 ),
                 SizedBox(height: 20),
-                buildLoginButton(),
+                buildLoginButton(context), // Pass context
                 SizedBox(height: 20),
                 Center(
                   child: GestureDetector(
@@ -86,6 +86,28 @@ class _LoginPageState extends State<LoginPage> {
               ],
             ),
           ),
+        ),
+      ),
+    );
+  }
+
+  Widget buildLoginButton(BuildContext context) {
+    return ElevatedButton(
+      onPressed: () {
+        // Navigate to Homepage on login button press
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => Homepage()),
+        );
+      },
+      style: ElevatedButton.styleFrom(
+        backgroundColor: Colors.orange,
+        padding: EdgeInsets.symmetric(vertical: 12),
+      ),
+      child: Center(
+        child: Text(
+          'Login',
+          style: TextStyle(color: Colors.white, fontSize: 18),
         ),
       ),
     );
