@@ -1,5 +1,6 @@
 // ignore: file_names
 import 'package:flutter/material.dart';
+import '../Homepage/HomePage.dart';
 
 // TextField Builder Function
 Widget buildTextField(IconData icon, String hint, bool isPassword) {
@@ -32,20 +33,29 @@ Widget buildPasswordField(bool isPasswordVisible, VoidCallback togglePasswordVis
   );
 }
 
-// Login Button
-Widget buildLoginButton() {
+// Login Button (now accepts BuildContext)
+Widget buildLoginButton(BuildContext context) {
   return SizedBox(
     width: double.infinity,
     height: 50,
     child: ElevatedButton(
-      onPressed: () {},
+      onPressed: () {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => Homepage()),
+        );
+      },
       style: ElevatedButton.styleFrom(
         backgroundColor: Colors.orange,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
       ),
       child: Text(
         'LOGIN',
-        style: TextStyle(color: Colors.black, fontSize: 18, fontWeight: FontWeight.bold),
+        style: TextStyle(
+          color: Colors.black,
+          fontSize: 18,
+          fontWeight: FontWeight.bold,
+        ),
       ),
     ),
   );
