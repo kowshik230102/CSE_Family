@@ -1,6 +1,7 @@
-// ignore: file_names
 import 'package:csefamily/Entry/login_page.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:csefamily/theme/theme_provider.dart';
 import 'my_account_page.dart';
 
 class MenuButton extends StatelessWidget {
@@ -8,13 +9,15 @@ class MenuButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+
     return PopupMenuButton<String>(
-      icon: Icon(Icons.menu, color: Colors.black),
+      icon: Icon(Icons.menu, color: Theme.of(context).iconTheme.color),
       onSelected: (value) {
         if (value == 'profile') {
           _navigateToProfile(context);
         } else if (value == 'dark') {
-          _toggleDarkMode(context);
+          themeProvider.toggleTheme();
         } else if (value == 'settings') {
           _navigateToSettings(context);
         } else if (value == 'logout') {
@@ -26,9 +29,9 @@ class MenuButton extends StatelessWidget {
           value: 'profile',
           child: Row(
             children: [
-              Icon(Icons.person, color: Colors.black),
-              SizedBox(width: 10),
-              Text("Profile"),
+              Icon(Icons.person, color: Theme.of(context).iconTheme.color),
+              const SizedBox(width: 10),
+              const Text("Profile"),
             ],
           ),
         ),
@@ -36,9 +39,12 @@ class MenuButton extends StatelessWidget {
           value: 'dark',
           child: Row(
             children: [
-              Icon(Icons.dark_mode, color: Colors.black),
-              SizedBox(width: 10),
-              Text("Dark Mode"),
+              Icon(
+                themeProvider.isDark ? Icons.light_mode : Icons.dark_mode,
+                color: Theme.of(context).iconTheme.color,
+              ),
+              const SizedBox(width: 10),
+              Text(themeProvider.isDark ? "Light Mode" : "Dark Mode"),
             ],
           ),
         ),
@@ -46,9 +52,9 @@ class MenuButton extends StatelessWidget {
           value: 'settings',
           child: Row(
             children: [
-              Icon(Icons.settings, color: Colors.black),
-              SizedBox(width: 10),
-              Text("Settings"),
+              Icon(Icons.settings, color: Theme.of(context).iconTheme.color),
+              const SizedBox(width: 10),
+              const Text("Settings"),
             ],
           ),
         ),
@@ -56,9 +62,9 @@ class MenuButton extends StatelessWidget {
           value: 'logout',
           child: Row(
             children: [
-              Icon(Icons.logout, color: Colors.black),
-              SizedBox(width: 10),
-              Text("Logout"),
+              Icon(Icons.logout, color: Theme.of(context).iconTheme.color),
+              const SizedBox(width: 10),
+              const Text("Logout"),
             ],
           ),
         ),
@@ -69,26 +75,21 @@ class MenuButton extends StatelessWidget {
   void _navigateToProfile(BuildContext context) {
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => MyAccountPage()),
-    );
-  }
-
-  void _toggleDarkMode(BuildContext context) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text("Dark Mode Toggled")),
+      MaterialPageRoute(builder: (context) => const MyAccountPage()),
     );
   }
 
   void _navigateToSettings(BuildContext context) {
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text("Navigating to Settings...")),
+      const SnackBar(content: Text("Navigating to Settings...")),
     );
   }
 
   void _handleLogout(BuildContext context) {
-    Navigator.push(
+    Navigator.pushAndRemoveUntil(
       context,
-      MaterialPageRoute(builder: (context) => LoginPage()),
+      MaterialPageRoute(builder: (context) => const LoginPage()),
+      (route) => false,
     );
   }
 }
