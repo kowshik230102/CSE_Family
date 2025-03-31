@@ -1,7 +1,7 @@
 import 'package:csefamily/Entry/login_page.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart'; // Required for Firebase
-import 'firebase_options.dart'; // Generated file by FlutterFire CLI
+import 'firebase_options.dart';
 
 void main() async {
   // Ensure Flutter is initialized
