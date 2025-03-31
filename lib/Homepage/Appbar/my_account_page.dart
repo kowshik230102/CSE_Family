@@ -1,9 +1,7 @@
-// my_account_page.dart
-// Main profile page that combines all components
-
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 import 'Profile/profile_image_service.dart';
 import 'Profile/profile_image_widget.dart';
@@ -53,6 +51,21 @@ class _MyAccountPageState extends State<MyAccountPage> {
     super.initState();
     _initializeControllers();
     _loadUserData();
+    _checkPermissions();
+  }
+
+  Future<void> _checkPermissions() async {
+    if (Platform.isAndroid || Platform.isIOS) {
+      final status = await Permission.photos.request();
+      if (status.isDenied) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+                content: Text('Photo library permission is required')),
+          );
+        }
+      }
+    }
   }
 
   @override
@@ -152,13 +165,14 @@ class _MyAccountPageState extends State<MyAccountPage> {
       final user = FirebaseAuth.instance.currentUser;
       if (user == null) return;
 
-      final imageUrl = await imageService.uploadImage(pickedImage, user.uid);
+      final imageUrl =
+          await imageService.uploadProfileImage(pickedImage, user.uid);
       await userRepository.updateProfileImageUrl(user.uid, imageUrl);
 
       if (mounted) {
         setState(() {
           profileImageUrl = imageUrl;
-          profileImage = null; // Clear the local file after upload
+          profileImage = null;
         });
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Profile picture updated successfully')),
@@ -172,6 +186,7 @@ class _MyAccountPageState extends State<MyAccountPage> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Failed to update image: ${e.toString()}')),
         );
+        debugPrint('Image upload error: $e');
       }
     }
   }
@@ -357,7 +372,6 @@ class _MyAccountPageState extends State<MyAccountPage> {
                     onPressed: () {
                       setState(() {
                         isEditing = false;
-                        // Reset all controllers
                         nameController.text = name;
                         idController.text = id;
                         regController.text = reg;

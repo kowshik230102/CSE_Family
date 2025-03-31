@@ -1,6 +1,9 @@
 // ignore: file_names
 import 'package:csefamily/Entry/signup_page.dart';
+import 'package:csefamily/Homepage/HomePage.dart';
 import 'package:flutter/material.dart';
+
+import 'Find_User/user_search_screen.dart';
 
 class IconSection extends StatelessWidget {
   const IconSection({super.key});
@@ -18,7 +21,7 @@ class IconSection extends StatelessWidget {
               _buildIconButton(Icons.home, "Home", () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => SignUpPage()),
+                  MaterialPageRoute(builder: (context) => Homepage()),
                 );
               }),
               _buildIconButton(Icons.group, "Batch", () {
@@ -30,7 +33,7 @@ class IconSection extends StatelessWidget {
               _buildIconButton(Icons.person_search, "Find", () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => SignUpPage()),
+                  MaterialPageRoute(builder: (context) => UserSearchScreen()),
                 );
               }),
               _buildIconButton(Icons.notifications, "Alerts", () {

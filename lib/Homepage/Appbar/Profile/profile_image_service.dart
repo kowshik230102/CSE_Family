@@ -1,14 +1,11 @@
-// profile_image_service.dart
-// Handles profile image picking and uploading to Firebase Storage
-
 import 'dart:io';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:image_picker/image_picker.dart';
 
 class ProfileImageService {
   final ImagePicker picker = ImagePicker();
 
+  /// Picks an image from the gallery
   Future<File?> pickImage() async {
     try {
       final pickedFile = await picker.pickImage(
@@ -22,11 +19,11 @@ class ProfileImageService {
     }
   }
 
-  Future<String> uploadImage(File imageFile, String userId) async {
+  /// Uploads an image to Firebase Storage
+  Future<String> uploadProfileImage(File imageFile, String userId) async {
     try {
-      final storageRef = FirebaseStorage.instance
-          .ref()
-          .child('profile_pictures/$userId.jpg');
+      final storageRef =
+          FirebaseStorage.instance.ref().child('profile_pictures/$userId.jpg');
       await storageRef.putFile(imageFile);
       return await storageRef.getDownloadURL();
     } catch (e) {
@@ -34,11 +31,11 @@ class ProfileImageService {
     }
   }
 
+  /// Deletes an image from Firebase Storage
   Future<void> deleteImage(String userId) async {
     try {
-      final storageRef = FirebaseStorage.instance
-          .ref()
-          .child('profile_pictures/$userId.jpg');
+      final storageRef =
+          FirebaseStorage.instance.ref().child('profile_pictures/$userId.jpg');
       await storageRef.delete();
     } catch (e) {
       throw Exception('Failed to delete image: ${e.toString()}');
