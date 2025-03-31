@@ -7,13 +7,11 @@ import 'firebase_options.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  
-  // Initialize Firebase
+
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
-  // Initialize theme provider and load preferences
   final themeProvider = ThemeProvider();
   await themeProvider.loadThemePreference();
 
@@ -34,24 +32,67 @@ class MyApp extends StatelessWidget {
 
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      theme: ThemeData.light().copyWith(
-        // Customize light theme if needed
-        primaryColor: Colors.blue,
-        appBarTheme: const AppBarTheme(
-          color: Colors.blue,
-          titleTextStyle: TextStyle(color: Colors.white, fontSize: 20),
-        ),
-      ),
-      darkTheme: ThemeData.dark().copyWith(
-        // Customize dark theme if needed
-        primaryColor: Colors.blue[800],
-        appBarTheme: AppBarTheme(
-          color: Colors.blue[800],
-          titleTextStyle: const TextStyle(color: Colors.white, fontSize: 20),
-        ),
-      ),
+      theme: _buildLightTheme(),
+      darkTheme: _buildDarkTheme(),
       themeMode: themeProvider.themeMode,
       home: const LoginPage(),
+    );
+  }
+
+  ThemeData _buildLightTheme() {
+    return ThemeData(
+      brightness: Brightness.light,
+      primarySwatch: Colors.blue,
+      appBarTheme: const AppBarTheme(
+        backgroundColor: Colors.blue,
+        titleTextStyle: TextStyle(
+          color: Colors.white,
+          fontSize: 20,
+          fontWeight: FontWeight.bold,
+        ),
+        iconTheme: IconThemeData(color: Colors.white),
+      ),
+      textTheme: const TextTheme(
+        bodyLarge: TextStyle(color: Colors.black87),
+        bodyMedium: TextStyle(color: Colors.black87),
+      ),
+      cardTheme: CardTheme(
+        color: Colors.white,
+        elevation: 2,
+        margin: const EdgeInsets.all(8),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10),
+        ),
+      ),
+    );
+  }
+
+  ThemeData _buildDarkTheme() {
+    return ThemeData(
+      brightness: Brightness.dark,
+      primarySwatch: Colors.blue,
+      appBarTheme: AppBarTheme(
+        backgroundColor: Colors.grey[900],
+        titleTextStyle: const TextStyle(
+          color: Colors.white,
+          fontSize: 20,
+          fontWeight: FontWeight.bold,
+        ),
+        iconTheme: const IconThemeData(color: Colors.white),
+      ),
+      textTheme: const TextTheme(
+        bodyLarge: TextStyle(color: Colors.white),
+        bodyMedium: TextStyle(color: Colors.white70),
+      ),
+      cardTheme: CardTheme(
+        color: Colors.grey[800],
+        elevation: 2,
+        margin: const EdgeInsets.all(8),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10),
+        ),
+      ),
+      dialogBackgroundColor: Colors.grey[900],
     );
   }
 }
