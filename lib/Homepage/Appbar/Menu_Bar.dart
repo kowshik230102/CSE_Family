@@ -1,6 +1,6 @@
 // ignore: file_names
 import 'package:flutter/material.dart';
-import 'Account_Profile.dart';
+import 'my_account_page.dart';
 
 class MenuButton extends StatelessWidget {
   const MenuButton({super.key});
