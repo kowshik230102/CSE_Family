@@ -1,9 +1,7 @@
-// ignore: file_names
 import 'package:csefamily/Entry/signup_page.dart';
 import 'package:csefamily/Homepage/HomePage.dart';
+import 'package:csefamily/Homepage/Icon_Section/Find_User/user_search_screen.dart';
 import 'package:flutter/material.dart';
-
-import 'Find_User/user_search_screen.dart';
 
 class IconSection extends StatelessWidget {
   const IconSection({super.key});
@@ -21,36 +19,38 @@ class IconSection extends StatelessWidget {
               _buildIconButton(Icons.home, "Home", () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => Homepage()),
+                  MaterialPageRoute(builder: (context) => const Homepage()),
                 );
               }),
               _buildIconButton(Icons.group, "Batch", () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => SignUpPage()),
+                  MaterialPageRoute(builder: (context) => const SignUpPage()),
                 );
               }),
               _buildIconButton(Icons.person_search, "Find", () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => UserSearchScreen()),
+                  MaterialPageRoute(
+                    builder: (context) => const UserSearchScreen(), // Corrected to UserSearchScreen
+                  ),
                 );
               }),
               _buildIconButton(Icons.notifications, "Alerts", () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => SignUpPage()),
+                  MaterialPageRoute(builder: (context) => const SignUpPage()),
                 );
               }),
               _buildIconButton(Icons.message, "SMS", () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => SignUpPage()),
+                  MaterialPageRoute(builder: (context) => const SignUpPage()),
                 );
               }),
             ],
           ),
-          SizedBox(height: 10),
+          const SizedBox(height: 10),
           // Second Row of Buttons
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -58,31 +58,31 @@ class IconSection extends StatelessWidget {
               _buildIconButton(Icons.announcement, "Notice", () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => SignUpPage()),
+                  MaterialPageRoute(builder: (context) => const SignUpPage()),
                 );
               }),
               _buildIconButton(Icons.grade, "Result", () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => SignUpPage()),
+                  MaterialPageRoute(builder: (context) => const SignUpPage()),
                 );
               }),
               _buildIconButton(Icons.emoji_events, "Achieve", () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => SignUpPage()),
+                  MaterialPageRoute(builder: (context) => const SignUpPage()),
                 );
               }),
               _buildIconButton(Icons.sports, "Sports", () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => SignUpPage()),
+                  MaterialPageRoute(builder: (context) => const SignUpPage()),
                 );
               }),
               _buildIconButton(Icons.more_horiz, "Other", () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => SignUpPage()),
+                  MaterialPageRoute(builder: (context) => const SignUpPage()),
                 );
               }),
             ],
@@ -98,18 +98,18 @@ class IconSection extends StatelessWidget {
         GestureDetector(
           onTap: onPressed,
           child: Container(
-            padding: EdgeInsets.all(8), // Small padding for touch area
+            padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
               color: Colors.blue.shade100,
               shape: BoxShape.circle,
             ),
-            child: Icon(icon, size: 24, color: Colors.blue), // Button icon
+            child: Icon(icon, size: 24, color: Colors.blue),
           ),
         ),
-        SizedBox(height: 3),
+        const SizedBox(height: 3),
         Text(
           label,
-          style: TextStyle(fontSize: 11, fontWeight: FontWeight.w500),
+          style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w500),
         ),
       ],
     );

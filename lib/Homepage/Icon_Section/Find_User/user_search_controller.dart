@@ -1,52 +1,69 @@
 // user_search_controller.dart
-// Handles the business logic for user search
-// Manages Firestore queries and search functionality
+// Fixed search queries to properly find users
 
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class UserSearchController with ChangeNotifier {
-  List<Map<String, dynamic>> _searchResults = [];
+  List<DocumentSnapshot> _searchResults = [];
   bool _isSearching = false;
-  String _lastSearchTerm = '';
+  String? _lastError;
 
-  List<Map<String, dynamic>> get searchResults => _searchResults;
+  List<DocumentSnapshot> get searchResults => _searchResults;
   bool get isSearching => _isSearching;
+  String? get lastError => _lastError;
 
-  Future<void> searchUsers(String searchTerm) async {
-    if (searchTerm.isEmpty || searchTerm == _lastSearchTerm) return;
+  Future<void> searchUsers(String query, String searchType) async {
+    if (query.isEmpty) {
+      _searchResults = [];
+      notifyListeners();
+      return;
+    }
     
-    _lastSearchTerm = searchTerm;
     _isSearching = true;
+    _lastError = null;
     notifyListeners();
 
     try {
       final usersCollection = FirebaseFirestore.instance.collection('users');
+      Query queryRef;
+
+      // Convert query to lowercase for case-insensitive search
+      final searchQuery = query.toLowerCase();
+
+      if (searchType == 'name') {
+        queryRef = usersCollection
+            .where('nameLowercase', isGreaterThanOrEqualTo: searchQuery)
+            .where('nameLowercase', isLessThanOrEqualTo: '$searchQuery\uf8ff')
+            .limit(20);
+      } else {
+        queryRef = usersCollection
+            .where('id', isEqualTo: searchQuery)
+            .limit(20);
+      }
+
+      final results = await queryRef.get();
       
-      // Search by name (case insensitive)
-      final nameQuery = usersCollection
-          .where('name', isGreaterThanOrEqualTo: searchTerm)
-          .where('name', isLessThanOrEqualTo: '$searchTerm\uf8ff')
-          .limit(10);
+      if (results.docs.isEmpty) {
+        // Fallback search if no results found
+        queryRef = usersCollection
+            .orderBy(searchType == 'name' ? 'name' : 'id')
+            .limit(20);
+        
+        final fallbackResults = await queryRef.get();
+        _searchResults = fallbackResults.docs.where((doc) {
+          final data = doc.data() as Map<String, dynamic>;
+          final fieldValue = (data[searchType == 'name' ? 'name' : 'id'] ?? '').toString().toLowerCase();
+          return fieldValue.contains(searchQuery);
+        }).toList();
+      } else {
+        _searchResults = results.docs;
+      }
 
-      // Search by ID (exact match)
-      final idQuery = usersCollection
-          .where('id', isEqualTo: searchTerm)
-          .limit(1);
-
-      final nameResults = await nameQuery.get();
-      final idResults = await idQuery.get();
-
-      _searchResults = [
-        ...idResults.docs.map((doc) => doc.data()),
-        ...nameResults.docs.map((doc) => doc.data()),
-      ];
-
-      // Remove duplicates
-      _searchResults = _searchResults.toSet().toList();
     } catch (e) {
-      debugPrint('Search error: $e');
+      _lastError = 'Search error: ${e.toString()}';
       _searchResults = [];
+      debugPrint('Search error: $e');
     } finally {
       _isSearching = false;
       notifyListeners();

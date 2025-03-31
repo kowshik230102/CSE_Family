@@ -1,19 +1,19 @@
 // user_info_widget.dart
-// Contains the user information display and edit fields
+// Updated to handle null controller
 
 import 'package:flutter/material.dart';
 
 class UserInfoWidget extends StatelessWidget {
   final String label;
   final String value;
-  final TextEditingController controller;
+  final TextEditingController? controller;
   final bool isEditing;
 
   const UserInfoWidget({
     super.key,
     required this.label,
     required this.value,
-    required this.controller,
+    this.controller,
     required this.isEditing,
   });
 
@@ -33,50 +33,36 @@ class UserInfoWidget extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 6),
-          isEditing
-              ? _buildEditField()
-              : _buildDisplayField(),
+          isEditing && controller != null
+              ? TextField(
+                  controller: controller,
+                  style: const TextStyle(fontSize: 16),
+                  decoration: InputDecoration(
+                    contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 12, vertical: 10),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                      borderSide: BorderSide(color: Colors.grey.shade300),
+                    ),
+                  ),
+                )
+              : Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 12, vertical: 10),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(8),
+                    color: Colors.grey.shade50,
+                  ),
+                  child: Text(
+                    value.isNotEmpty ? value : "Not provided",
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ),
         ],
-      ),
-    );
-  }
-
-  Widget _buildEditField() {
-    return TextField(
-      controller: controller,
-      style: const TextStyle(fontSize: 16),
-      decoration: InputDecoration(
-        contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-          borderSide: BorderSide(color: Colors.grey.shade300),
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-          borderSide: BorderSide(color: Colors.grey.shade300),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-          borderSide: BorderSide(color: Colors.blue.shade800),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildDisplayField() {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(8),
-        color: Colors.grey.shade50,
-      ),
-      child: Text(
-        value.isNotEmpty ? value : "Not provided",
-        style: const TextStyle(
-          fontSize: 16,
-          fontWeight: FontWeight.w500,
-        ),
       ),
     );
   }

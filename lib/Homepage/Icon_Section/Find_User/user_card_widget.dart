@@ -1,8 +1,8 @@
 // user_card_widget.dart
-// Displays individual user cards in search results
-// Shows user name, ID, and profile picture
+// Fixed to properly pass user UID when navigating to profile
 
 import 'package:flutter/material.dart';
+import 'user_profile_screen.dart';
 
 class UserCardWidget extends StatelessWidget {
   final Map<String, dynamic> user;
@@ -25,10 +25,21 @@ class UserCardWidget extends StatelessWidget {
         subtitle: Text('ID: ${user['id'] ?? 'N/A'}'),
         trailing: const Icon(Icons.arrow_forward),
         onTap: () {
-          // Navigate to user profile
-          // Navigator.push(context, MaterialPageRoute(
-          //   builder: (context) => UserProfileScreen(userId: user['id'])
-          // ));
+          // Use the document ID (uid) as the primary identifier
+          final userId = user['uid'] ?? '';
+          if (userId.isEmpty) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('User ID not found')),
+            );
+            return;
+          }
+          
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => UserProfileScreen(userId: userId),
+            ),
+          );
         },
       ),
     );
