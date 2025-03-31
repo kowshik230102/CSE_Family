@@ -1,7 +1,9 @@
 import 'package:csefamily/Entry/signup_page.dart';
 import 'package:csefamily/Homepage/HomePage.dart';
-import 'package:csefamily/Homepage/Icon_Section/Find_User/user_search_screen.dart';
 import 'package:flutter/material.dart';
+
+import 'Batch_User/batch_list_screen.dart';
+import 'Find_User/user_search_screen.dart';
 
 class IconSection extends StatelessWidget {
   const IconSection({super.key});
@@ -25,14 +27,15 @@ class IconSection extends StatelessWidget {
               _buildIconButton(Icons.group, "Batch", () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => const SignUpPage()),
+                  MaterialPageRoute(
+                      builder: (context) => const BatchListScreen()),
                 );
               }),
               _buildIconButton(Icons.person_search, "Find", () {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => const UserSearchScreen(), // Corrected to UserSearchScreen
+                    builder: (context) => const UserSearchScreen(),
                   ),
                 );
               }),

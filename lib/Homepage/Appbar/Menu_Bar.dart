@@ -1,4 +1,5 @@
 // ignore: file_names
+import 'package:csefamily/Entry/login_page.dart';
 import 'package:flutter/material.dart';
 import 'my_account_page.dart';
 
@@ -68,7 +69,7 @@ class MenuButton extends StatelessWidget {
   void _navigateToProfile(BuildContext context) {
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => MyAccountPage()), // Navigate to MyAccountPage
+      MaterialPageRoute(builder: (context) => MyAccountPage()),
     );
   }
 
@@ -85,8 +86,9 @@ class MenuButton extends StatelessWidget {
   }
 
   void _handleLogout(BuildContext context) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text("Logging Out...")),
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => LoginPage()),
     );
   }
 }
