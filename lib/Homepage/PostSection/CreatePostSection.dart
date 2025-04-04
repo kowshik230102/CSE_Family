@@ -22,10 +22,8 @@ class _CreatePostSectionState extends State<CreatePostSection> {
 
   String? _selectedTag;
   File? _imageFile;
-  File? _documentFile;
   bool _isLoading = false;
   bool _isPostEnabled = false;
-  String? _documentFileName;
 
   final List<String> _tags = [
     "Notice",
@@ -60,8 +58,6 @@ class _CreatePostSectionState extends State<CreatePostSection> {
       if (image != null) {
         setState(() {
           _imageFile = File(image.path);
-          _documentFile = null; // Clear document if image is selected
-          _documentFileName = null;
         });
       }
     } catch (e) {
@@ -69,31 +65,19 @@ class _CreatePostSectionState extends State<CreatePostSection> {
     }
   }
 
-  Future<void> _pickDocument() async {
-    try {
-      final XFile? file = await _picker.pickMedia();
-      if (file != null) {
-        setState(() {
-          _documentFile = File(file.path);
-          _documentFileName = file.name;
-          _imageFile = null; // Clear image if document is selected
-        });
-      }
-    } catch (e) {
-      _showError("Failed to pick document: ${e.toString()}");
-    }
-  }
+  Future<String?> _uploadImage() async {
+    if (_imageFile == null) return null;
 
-  Future<String?> _uploadFile(File file, String path) async {
     try {
       final ref = _storage
           .ref()
-          .child('$path/${DateTime.now().millisecondsSinceEpoch}');
-      final uploadTask = ref.putFile(file);
+          .child('post_images/${DateTime.now().millisecondsSinceEpoch}.jpg');
+
+      final uploadTask = ref.putFile(_imageFile!);
       final snapshot = await uploadTask.whenComplete(() => {});
       return await snapshot.ref.getDownloadURL();
     } catch (e) {
-      _showError("File upload failed: ${e.toString()}");
+      _showError("Image upload failed: ${e.toString()}");
       return null;
     }
   }
@@ -112,24 +96,12 @@ class _CreatePostSectionState extends State<CreatePostSection> {
       if (!userDoc.exists) throw Exception("User data not found");
 
       final userData = userDoc.data() as Map<String, dynamic>;
-
-      // Upload files if they exist
-      String? imageUrl;
-      String? documentUrl;
-
-      if (_imageFile != null) {
-        imageUrl = await _uploadFile(_imageFile!, 'post_images');
-      }
-
-      if (_documentFile != null) {
-        documentUrl = await _uploadFile(_documentFile!, 'post_documents');
-      }
+      final imageUrl = await _uploadImage();
 
       // Validate required fields
       if (_selectedTag == null) throw Exception("Please select a tag");
-      if (_postController.text.trim().isEmpty) {
+      if (_postController.text.trim().isEmpty)
         throw Exception("Post content cannot be empty");
-      }
 
       // Create post data
       final postData = {
@@ -139,8 +111,6 @@ class _CreatePostSectionState extends State<CreatePostSection> {
         'authorName': userData['name'] ?? user.displayName ?? 'Anonymous',
         'authorAvatar': userData['avatarUrl'] ?? user.photoURL ?? '',
         'imageUrl': imageUrl,
-        'documentUrl': documentUrl,
-        'documentName': _documentFileName,
         'timestamp': FieldValue.serverTimestamp(),
         'likes': 0,
         'comments': 0,
@@ -155,8 +125,6 @@ class _CreatePostSectionState extends State<CreatePostSection> {
       setState(() {
         _selectedTag = null;
         _imageFile = null;
-        _documentFile = null;
-        _documentFileName = null;
         _isPostEnabled = false;
       });
 
@@ -195,6 +163,8 @@ class _CreatePostSectionState extends State<CreatePostSection> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return SingleChildScrollView(
       child: Padding(
         padding: EdgeInsets.only(
@@ -210,7 +180,7 @@ class _CreatePostSectionState extends State<CreatePostSection> {
                 style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
-                  color: Colors.blue,
+                  color: theme.colorScheme.primary,
                 ),
               ),
               const SizedBox(height: 16),
@@ -218,13 +188,17 @@ class _CreatePostSectionState extends State<CreatePostSection> {
               // Post Content Field
               TextField(
                 controller: _postController,
-                maxLines: 5,
+                maxLines: 3, // Reduced from 5 to 3
+                minLines: 1,
                 decoration: InputDecoration(
                   hintText: "What's on your mind?",
                   border: OutlineInputBorder(),
                   filled: true,
-                  fillColor: Colors.grey[100],
+                  fillColor: theme.cardTheme.color,
+                  hintStyle: TextStyle(color: theme.hintColor),
+                  contentPadding: const EdgeInsets.all(12),
                 ),
+                style: TextStyle(color: theme.textTheme.bodyLarge?.color),
               ),
               const SizedBox(height: 16),
 
@@ -235,12 +209,17 @@ class _CreatePostSectionState extends State<CreatePostSection> {
                   labelText: "Select a tag",
                   border: OutlineInputBorder(),
                   filled: true,
-                  fillColor: Colors.grey[100],
+                  fillColor: theme.cardTheme.color,
+                  labelStyle:
+                      TextStyle(color: theme.textTheme.bodyLarge?.color),
                 ),
+                dropdownColor: theme.cardTheme.color,
                 items: _tags.map((tag) {
                   return DropdownMenuItem<String>(
                     value: tag,
-                    child: Text(tag),
+                    child: Text(tag,
+                        style:
+                            TextStyle(color: theme.textTheme.bodyLarge?.color)),
                   );
                 }).toList(),
                 onChanged: (value) {
@@ -253,6 +232,7 @@ class _CreatePostSectionState extends State<CreatePostSection> {
                   if (value == null) return 'Please select a tag';
                   return null;
                 },
+                style: TextStyle(color: theme.textTheme.bodyLarge?.color),
               ),
               const SizedBox(height: 16),
 
@@ -272,26 +252,9 @@ class _CreatePostSectionState extends State<CreatePostSection> {
                     const SizedBox(height: 8),
                     OutlinedButton(
                       onPressed: () => setState(() => _imageFile = null),
-                      child: Text("Remove Image"),
-                    ),
-                    const SizedBox(height: 16),
-                  ],
-                ),
-
-              // Document Preview
-              if (_documentFile != null)
-                Column(
-                  children: [
-                    ListTile(
-                      leading: Icon(Icons.insert_drive_file),
-                      title: Text(_documentFileName ?? 'Document'),
-                      trailing: IconButton(
-                        icon: Icon(Icons.close),
-                        onPressed: () => setState(() {
-                          _documentFile = null;
-                          _documentFileName = null;
-                        }),
-                      ),
+                      child: Text("Remove Image",
+                          style: TextStyle(
+                              color: theme.textTheme.bodyLarge?.color)),
                     ),
                     const SizedBox(height: 16),
                   ],
@@ -302,21 +265,13 @@ class _CreatePostSectionState extends State<CreatePostSection> {
                 children: [
                   // Add Image Button
                   IconButton(
-                    icon: Icon(Icons.image, color: Colors.blue),
+                    icon: Icon(Icons.image, color: theme.colorScheme.primary),
                     onPressed: _pickImage,
                     tooltip: 'Add Image',
                   ),
                   const SizedBox(width: 8),
-                  Text("Add Image", style: TextStyle(color: Colors.blue)),
-
-                  // Add Document Button
-                  IconButton(
-                    icon: Icon(Icons.attach_file, color: Colors.blue),
-                    onPressed: _pickDocument,
-                    tooltip: 'Add Document',
-                  ),
-                  const SizedBox(width: 8),
-                  Text("Add File", style: TextStyle(color: Colors.blue)),
+                  Text("Add Image",
+                      style: TextStyle(color: theme.colorScheme.primary)),
 
                   const Spacer(),
 
@@ -325,9 +280,9 @@ class _CreatePostSectionState extends State<CreatePostSection> {
                     onPressed:
                         _isPostEnabled && !_isLoading ? _submitPost : null,
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.blue,
-                      padding:
-                          EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                      backgroundColor: theme.colorScheme.primary,
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 24, vertical: 12),
                     ),
                     child: _isLoading
                         ? SizedBox(
@@ -340,7 +295,8 @@ class _CreatePostSectionState extends State<CreatePostSection> {
                           )
                         : Text(
                             "Post",
-                            style: TextStyle(color: Colors.white),
+                            style:
+                                TextStyle(color: theme.colorScheme.onPrimary),
                           ),
                   ),
                 ],
