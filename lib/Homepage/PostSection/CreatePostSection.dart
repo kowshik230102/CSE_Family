@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
+import '../Appbar/my_account_page.dart'; // Ensure this path is correct
 
 class CreatePostSection extends StatefulWidget {
   final Function()? onPostCreated;
@@ -22,12 +23,9 @@ class _CreatePostSectionState extends State<CreatePostSection> {
 
   String? _selectedTag;
   File? _imageFile;
-  File? _documentFile;
   bool _isLoading = false;
   bool _isPostEnabled = false;
-  bool _showPollOptions = false;
-  final List<String> _pollOptions = ['', ''];
-  String _postType = 'post'; // 'post', 'poll', or 'document'
+  String _userFirstName = 'User';
 
   final List<String> _tags = [
     "Notice",
@@ -41,6 +39,26 @@ class _CreatePostSectionState extends State<CreatePostSection> {
   void initState() {
     super.initState();
     _postController.addListener(_updatePostButtonState);
+    _fetchUserData();
+  }
+
+  Future<void> _fetchUserData() async {
+    final user = _auth.currentUser;
+    if (user != null) {
+      try {
+        final userDoc =
+            await _firestore.collection('users').doc(user.uid).get();
+        if (userDoc.exists) {
+          final userData = userDoc.data() as Map<String, dynamic>;
+          final fullName = userData['name'] ?? user.displayName ?? 'User';
+          setState(() {
+            _userFirstName = fullName.split(' ').first;
+          });
+        }
+      } catch (e) {
+        debugPrint('Error fetching user data: $e');
+      }
+    }
   }
 
   @override
@@ -51,10 +69,8 @@ class _CreatePostSectionState extends State<CreatePostSection> {
 
   void _updatePostButtonState() {
     setState(() {
-      _isPostEnabled = _postController.text.trim().isNotEmpty &&
-          (_selectedTag != null || _postType == 'poll') &&
-          !(_postType == 'poll' &&
-              _pollOptions.any((option) => option.isEmpty));
+      _isPostEnabled =
+          _postController.text.trim().isNotEmpty && _selectedTag != null;
     });
   }
 
@@ -64,7 +80,6 @@ class _CreatePostSectionState extends State<CreatePostSection> {
       if (image != null) {
         setState(() {
           _imageFile = File(image.path);
-          _postType = 'post';
         });
       }
     } catch (e) {
@@ -72,32 +87,19 @@ class _CreatePostSectionState extends State<CreatePostSection> {
     }
   }
 
-  Future<void> _pickDocument() async {
-    try {
-      final XFile? file = await _picker.pickMedia();
-      if (file != null) {
-        setState(() {
-          _documentFile = File(file.path);
-          _postType = 'document';
-        });
-      }
-    } catch (e) {
-      _showError("Failed to pick document: ${e.toString()}");
-    }
-  }
-
-  Future<String?> _uploadFile(File? file, String path) async {
-    if (file == null) return null;
+  Future<String?> _uploadImage() async {
+    if (_imageFile == null) return null;
 
     try {
       final ref = _storage
           .ref()
-          .child('$path/${DateTime.now().millisecondsSinceEpoch}');
-      final uploadTask = ref.putFile(file);
+          .child('post_images/${DateTime.now().millisecondsSinceEpoch}.jpg');
+
+      final uploadTask = ref.putFile(_imageFile!);
       final snapshot = await uploadTask.whenComplete(() => {});
       return await snapshot.ref.getDownloadURL();
     } catch (e) {
-      _showError("File upload failed: ${e.toString()}");
+      _showError("Image upload failed: ${e.toString()}");
       return null;
     }
   }
@@ -115,18 +117,11 @@ class _CreatePostSectionState extends State<CreatePostSection> {
       if (!userDoc.exists) throw Exception("User data not found");
 
       final userData = userDoc.data() as Map<String, dynamic>;
-      final imageUrl = await _uploadFile(_imageFile, 'post_images');
-      final documentUrl = await _uploadFile(_documentFile, 'post_documents');
+      final imageUrl = await _uploadImage();
 
-      if (_postType == 'post' && _selectedTag == null) {
-        throw Exception("Please select a tag");
-      }
-      if (_postController.text.trim().isEmpty) {
+      if (_selectedTag == null) throw Exception("Please select a tag");
+      if (_postController.text.trim().isEmpty)
         throw Exception("Post content cannot be empty");
-      }
-      if (_postType == 'poll' && _pollOptions.any((option) => option.isEmpty)) {
-        throw Exception("Poll options cannot be empty");
-      }
 
       final postData = {
         'content': _postController.text.trim(),
@@ -135,15 +130,10 @@ class _CreatePostSectionState extends State<CreatePostSection> {
         'authorName': userData['name'] ?? user.displayName ?? 'Anonymous',
         'authorAvatar': userData['avatarUrl'] ?? user.photoURL ?? '',
         'imageUrl': imageUrl,
-        'documentUrl': documentUrl,
         'timestamp': FieldValue.serverTimestamp(),
         'likes': 0,
         'comments': 0,
         'edited': false,
-        'type': _postType,
-        if (_postType == 'poll') 'pollOptions': _pollOptions,
-        if (_postType == 'poll')
-          'pollVotes': List.filled(_pollOptions.length, 0),
       };
 
       await _firestore.collection('posts').add(postData);
@@ -152,15 +142,13 @@ class _CreatePostSectionState extends State<CreatePostSection> {
       setState(() {
         _selectedTag = null;
         _imageFile = null;
-        _documentFile = null;
         _isPostEnabled = false;
-        _showPollOptions = false;
-        _pollOptions.fillRange(0, 2, '');
-        _postType = 'post';
       });
 
       widget.onPostCreated?.call();
       _showSuccess("Post created successfully!");
+    } on FirebaseException catch (e) {
+      _showError("Firebase error: ${e.message}");
     } catch (e) {
       _showError("Error: ${e.toString()}");
     } finally {
@@ -186,37 +174,12 @@ class _CreatePostSectionState extends State<CreatePostSection> {
     );
   }
 
-  void _showProfileDetails() {
-    final user = _auth.currentUser;
-    if (user == null) return;
-
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text("Profile Details"),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Center(
-              child: CircleAvatar(
-                radius: 40,
-                backgroundImage: NetworkImage(user.photoURL ?? ''),
-              ),
-            ),
-            SizedBox(height: 16),
-            Text("Name: ${user.displayName ?? 'Anonymous'}"),
-            Text("Email: ${user.email ?? 'Not provided'}"),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text("Close"),
-          ),
-        ],
-      ),
-    );
+  void _navigateToProfile() {
+    if (context.mounted) {
+      Navigator.of(context).push(
+        MaterialPageRoute(builder: (context) => const MyAccountPage()),
+      );
+    }
   }
 
   @override
@@ -239,38 +202,59 @@ class _CreatePostSectionState extends State<CreatePostSection> {
                 style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
-                  color: Colors.blue, // Changed to blue
+                  color: Colors.blue,
                 ),
               ),
               const SizedBox(height: 16),
-
-              // User profile and input row
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Profile circle
-                  GestureDetector(
-                    onTap: _showProfileDetails,
-                    child: CircleAvatar(
-                      radius: 24,
-                      backgroundImage: user?.photoURL != null
-                          ? NetworkImage(user!.photoURL!)
-                          : null,
-                      child: user?.photoURL == null
-                          ? Icon(Icons.person, size: 24)
-                          : null,
-                    ),
+                  Column(
+                    children: [
+                      GestureDetector(
+                        onTap: _navigateToProfile,
+                        child: Container(
+                          width: 60,
+                          height: 60,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: Colors.blue.shade100,
+                            image: user?.photoURL != null
+                                ? DecorationImage(
+                                    image: NetworkImage(user!.photoURL!),
+                                    fit: BoxFit.cover,
+                                  )
+                                : null,
+                          ),
+                          child: user?.photoURL == null
+                              ? Center(
+                                  child: Icon(
+                                    Icons.person,
+                                    size: 40,
+                                    color: Colors.blue,
+                                  ),
+                                )
+                              : null,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        _userFirstName,
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.blue,
+                        ),
+                      ),
+                    ],
                   ),
                   const SizedBox(width: 12),
-
-                  // Post content and tag
                   Expanded(
                     child: Column(
                       children: [
-                        // Post Content Field
                         TextField(
                           controller: _postController,
-                          maxLines: 8, // Increased height
+                          maxLines: 5,
                           minLines: 3,
                           decoration: InputDecoration(
                             hintText: "What's on your mind?",
@@ -284,8 +268,6 @@ class _CreatePostSectionState extends State<CreatePostSection> {
                               color: theme.textTheme.bodyLarge?.color),
                         ),
                         const SizedBox(height: 8),
-
-                        // Tag Selection
                         DropdownButtonFormField<String>(
                           value: _selectedTag,
                           decoration: InputDecoration(
@@ -320,56 +302,6 @@ class _CreatePostSectionState extends State<CreatePostSection> {
                 ],
               ),
               const SizedBox(height: 16),
-
-              // Post type selector
-              Row(
-                children: [
-                  _buildPostTypeButton(Icons.image, "Photo", 'post',
-                      isActive: _postType == 'post'),
-                  const SizedBox(width: 8),
-                  _buildPostTypeButton(Icons.poll, "Poll", 'poll',
-                      isActive: _postType == 'poll'),
-                  const SizedBox(width: 8),
-                  _buildPostTypeButton(
-                      Icons.insert_drive_file, "Document", 'document',
-                      isActive: _postType == 'document'),
-                ],
-              ),
-              const SizedBox(height: 16),
-
-              // Poll options (if poll selected)
-              if (_postType == 'poll')
-                Column(
-                  children: [
-                    ..._pollOptions.asMap().entries.map((entry) {
-                      final index = entry.key;
-                      return Padding(
-                        padding: const EdgeInsets.only(bottom: 8),
-                        child: TextField(
-                          decoration: InputDecoration(
-                            hintText: "Option ${index + 1}",
-                            border: OutlineInputBorder(),
-                          ),
-                          onChanged: (value) {
-                            _pollOptions[index] = value;
-                            _updatePostButtonState();
-                          },
-                        ),
-                      );
-                    }).toList(),
-                    if (_pollOptions.length < 4)
-                      TextButton(
-                        onPressed: () {
-                          setState(() {
-                            _pollOptions.add('');
-                          });
-                        },
-                        child: Text("Add Option"),
-                      ),
-                  ],
-                ),
-
-              // Image Preview
               if (_imageFile != null)
                 Column(
                   children: [
@@ -390,75 +322,43 @@ class _CreatePostSectionState extends State<CreatePostSection> {
                     const SizedBox(height: 16),
                   ],
                 ),
-
-              // Document Preview
-              if (_documentFile != null)
-                Column(
-                  children: [
-                    ListTile(
-                      leading: Icon(Icons.insert_drive_file),
-                      title: Text(_documentFile!.path.split('/').last),
-                      trailing: IconButton(
-                        icon: Icon(Icons.close),
-                        onPressed: () => setState(() => _documentFile = null),
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                  ],
-                ),
-
-              // Post Button
-              Align(
-                alignment: Alignment.centerRight,
-                child: ElevatedButton(
-                  onPressed: _isPostEnabled && !_isLoading ? _submitPost : null,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blue, // Changed to blue
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 24, vertical: 12),
+              Row(
+                children: [
+                  IconButton(
+                    icon: Icon(Icons.image, color: Colors.blue),
+                    onPressed: _pickImage,
+                    tooltip: 'Add Image',
                   ),
-                  child: _isLoading
-                      ? SizedBox(
-                          width: 20,
-                          height: 20,
-                          child: CircularProgressIndicator(
-                            color: Colors.white,
-                            strokeWidth: 2,
+                  const SizedBox(width: 8),
+                  Text("Add Image", style: TextStyle(color: Colors.blue)),
+                  const Spacer(),
+                  ElevatedButton(
+                    onPressed:
+                        _isPostEnabled && !_isLoading ? _submitPost : null,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.blue,
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 24, vertical: 12),
+                    ),
+                    child: _isLoading
+                        ? SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: CircularProgressIndicator(
+                              color: Colors.white,
+                              strokeWidth: 2,
+                            ),
+                          )
+                        : Text(
+                            "Post",
+                            style: TextStyle(color: Colors.white),
                           ),
-                        )
-                      : Text(
-                          "Post",
-                          style: TextStyle(color: Colors.white),
-                        ),
-                ),
+                  ),
+                ],
               ),
             ],
           ),
         ),
-      ),
-    );
-  }
-
-  Widget _buildPostTypeButton(IconData icon, String label, String type,
-      {required bool isActive}) {
-    return Expanded(
-      child: OutlinedButton.icon(
-        icon: Icon(icon, color: isActive ? Colors.blue : Colors.grey),
-        label: Text(label,
-            style: TextStyle(color: isActive ? Colors.blue : Colors.grey)),
-        style: OutlinedButton.styleFrom(
-          side: BorderSide(color: isActive ? Colors.blue : Colors.grey),
-          padding: EdgeInsets.symmetric(vertical: 12),
-        ),
-        onPressed: () {
-          setState(() {
-            _postType = type;
-            if (type == 'poll') {
-              _selectedTag = null;
-            }
-            _updatePostButtonState();
-          });
-        },
       ),
     );
   }

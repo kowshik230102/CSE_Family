@@ -42,7 +42,7 @@ class MyApp extends StatelessWidget {
   ThemeData _buildLightTheme() {
     return ThemeData(
       brightness: Brightness.light,
-      primarySwatch: Colors.blue,
+      primarySwatch: Colors.orange,
       appBarTheme: const AppBarTheme(
         backgroundColor: Color.fromARGB(255, 237, 251, 251),
         titleTextStyle: TextStyle(

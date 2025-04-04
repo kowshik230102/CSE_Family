@@ -282,7 +282,7 @@ class _MyAccountPageState extends State<MyAccountPage> {
         ),
         centerTitle: true,
         elevation: 0,
-        backgroundColor: Colors.blue.shade800,
+        backgroundColor: const Color.fromARGB(255, 237, 251, 251),
         foregroundColor: Colors.white,
       ),
       body: SingleChildScrollView(
