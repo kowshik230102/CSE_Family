@@ -57,6 +57,7 @@ class IconSection extends StatelessWidget {
           ),
           const SizedBox(height: 10),
           // Second Row of Buttons
+          // Update all the icon buttons to pass correct tags:
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -72,7 +73,7 @@ class IconSection extends StatelessWidget {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => const TagPostsScreen(tag: 'Notice'),
+                    builder: (context) => const TagPostsScreen(tag: 'Result'),
                   ),
                 );
               }),
@@ -80,7 +81,8 @@ class IconSection extends StatelessWidget {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => const TagPostsScreen(tag: 'Notice'),
+                    builder: (context) =>
+                        const TagPostsScreen(tag: 'Achievement'),
                   ),
                 );
               }),
@@ -88,7 +90,7 @@ class IconSection extends StatelessWidget {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => const TagPostsScreen(tag: 'Notice'),
+                    builder: (context) => const TagPostsScreen(tag: 'Sports'),
                   ),
                 );
               }),
@@ -96,7 +98,7 @@ class IconSection extends StatelessWidget {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => const TagPostsScreen(tag: 'Notice'),
+                    builder: (context) => const TagPostsScreen(tag: 'Others'),
                   ),
                 );
               }),

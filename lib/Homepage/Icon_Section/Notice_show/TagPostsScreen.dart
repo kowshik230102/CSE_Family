@@ -16,7 +16,7 @@ class TagPostsScreen extends StatelessWidget {
       body: StreamBuilder<QuerySnapshot>(
         stream: FirebaseFirestore.instance
             .collection('posts')
-            .where('tag', isEqualTo: tag)
+            .where('tag', isEqualTo: tag) // Filter by the specific tag
             .orderBy('timestamp', descending: true)
             .snapshots(),
         builder: (context, snapshot) {
@@ -85,7 +85,8 @@ class TagPostsScreen extends StatelessWidget {
                               ),
                               if (dateTime != null)
                                 Text(
-                                  DateFormat('MMM d, y • h:mm a').format(dateTime),
+                                  DateFormat('MMM d, y • h:mm a')
+                                      .format(dateTime),
                                   style: const TextStyle(
                                     color: Colors.grey,
                                     fontSize: 12,
@@ -102,13 +103,13 @@ class TagPostsScreen extends StatelessWidget {
                         padding: const EdgeInsets.symmetric(
                             horizontal: 8, vertical: 4),
                         decoration: BoxDecoration(
-                          color: Colors.blue.withOpacity(0.1),
+                          color: _getTagColor(post['tag']),
                           borderRadius: BorderRadius.circular(4),
                         ),
                         child: Text(
                           post['tag'],
                           style: const TextStyle(
-                            color: Colors.blue,
+                            color: Colors.white,
                             fontSize: 12,
                           ),
                         ),
@@ -140,21 +141,15 @@ class TagPostsScreen extends StatelessWidget {
                         children: [
                           IconButton(
                             icon: const Icon(Icons.thumb_up),
-                            onPressed: () {
-                              // TODO: Implement like functionality
-                            },
+                            onPressed: () {},
                           ),
                           IconButton(
                             icon: const Icon(Icons.comment),
-                            onPressed: () {
-                              // TODO: Implement comment functionality
-                            },
+                            onPressed: () {},
                           ),
                           IconButton(
                             icon: const Icon(Icons.share),
-                            onPressed: () {
-                              // TODO: Implement share functionality
-                            },
+                            onPressed: () {},
                           ),
                         ],
                       ),
@@ -167,5 +162,22 @@ class TagPostsScreen extends StatelessWidget {
         },
       ),
     );
+  }
+
+  Color _getTagColor(String tag) {
+    switch (tag) {
+      case 'Notice':
+        return Colors.green;
+      case 'Result':
+        return Colors.green;
+      case 'Achievement':
+        return Colors.green;
+      case 'Sports':
+        return Colors.green;
+      case 'Others':
+        return Colors.green;
+      default:
+        return Colors.green;
+    }
   }
 }
