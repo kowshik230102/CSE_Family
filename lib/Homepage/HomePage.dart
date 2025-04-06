@@ -26,18 +26,18 @@ class Homepage extends StatelessWidget {
             style: TextStyle(
               color: Colors.blue,
               fontWeight: FontWeight.bold,
-              fontSize: 18,
+              fontSize: 20,
             ),
           ),
         ),
         actions: [
-          IconButton(
-            icon: Icon(Icons.search, color: Colors.black),
-            onPressed: () {
-              // TODO: Implement search functionality
-            },
-          ),
-          SizedBox(width: 15),
+          // IconButton(
+          //   icon: Icon(Icons.search, color: Colors.black),
+          //   onPressed: () {
+          //     // TODO: Implement search functionality
+          //   },
+          // ),
+          // SizedBox(width: 15),
           MenuButton(),
         ],
       ),
