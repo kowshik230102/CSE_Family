@@ -24,7 +24,7 @@ class BatchListScreen extends StatelessWidget {
           ),
           centerTitle: true,
           foregroundColor: Colors.black, // Black text and back icon
-          backgroundColor: Colors.white, // Optional: white background
+          //backgroundColor: Colors.white, // Optional: white background
         ),
         body: const Padding(
           padding: EdgeInsets.all(16.0),

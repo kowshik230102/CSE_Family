@@ -12,7 +12,7 @@ class Homepage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.white, // Set background color to white
+        //backgroundColor: Colors.white, // Set background color to white
         elevation: 0,
         // leading: IconButton(
         //   icon: Icon(Icons.arrow_back, color: Colors.black), // Black back icon

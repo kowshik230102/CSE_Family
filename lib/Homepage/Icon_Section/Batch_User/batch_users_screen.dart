@@ -17,7 +17,7 @@ class BatchUsersScreen extends StatelessWidget {
       create: (_) => BatchUsersController(batchName),
       child: Scaffold(
         appBar: AppBar(
-          backgroundColor: Colors.white, // White app bar background
+          //backgroundColor: Colors.white, // White app bar background
           elevation: 0, // Remove shadow if desired
           leading: IconButton(
             icon: const Icon(Icons.arrow_back,
