@@ -1,9 +1,11 @@
+// ignore: file_names
 import 'package:csefamily/Entry/signup_page.dart';
 import 'package:csefamily/Homepage/HomePage.dart';
 import 'package:flutter/material.dart';
 
 import 'Batch_User/batch_list_screen.dart';
 import 'Find_User/user_search_screen.dart';
+import 'Notice_show/TagPostsScreen.dart';
 
 class IconSection extends StatelessWidget {
   const IconSection({super.key});
@@ -61,31 +63,41 @@ class IconSection extends StatelessWidget {
               _buildIconButton(Icons.announcement, "Notice", () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => const SignUpPage()),
+                  MaterialPageRoute(
+                    builder: (context) => const TagPostsScreen(tag: 'Notice'),
+                  ),
                 );
               }),
               _buildIconButton(Icons.grade, "Result", () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => const SignUpPage()),
+                  MaterialPageRoute(
+                    builder: (context) => const TagPostsScreen(tag: 'Notice'),
+                  ),
                 );
               }),
               _buildIconButton(Icons.emoji_events, "Achieve", () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => const SignUpPage()),
+                  MaterialPageRoute(
+                    builder: (context) => const TagPostsScreen(tag: 'Notice'),
+                  ),
                 );
               }),
               _buildIconButton(Icons.sports, "Sports", () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => const SignUpPage()),
+                  MaterialPageRoute(
+                    builder: (context) => const TagPostsScreen(tag: 'Notice'),
+                  ),
                 );
               }),
               _buildIconButton(Icons.more_horiz, "Other", () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => const SignUpPage()),
+                  MaterialPageRoute(
+                    builder: (context) => const TagPostsScreen(tag: 'Notice'),
+                  ),
                 );
               }),
             ],
