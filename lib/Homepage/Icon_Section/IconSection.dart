@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 
 import 'Batch_User/batch_list_screen.dart';
 import 'Find_User/user_search_screen.dart';
-import 'Notice_show/TagPostsScreen.dart';
+import 'Tag_button/TagPostsScreen.dart';
 
 class IconSection extends StatelessWidget {
   const IconSection({super.key});
