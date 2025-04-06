@@ -1,3 +1,4 @@
+// ignore: file_names
 import 'package:flutter/material.dart';
 import 'Icon_Section/IconSection.dart';
 import 'PostSection/CreatePostSection.dart';
@@ -11,8 +12,14 @@ class Homepage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        //backgroundColor: const Color.fromARGB(255, 252, 229, 146),
+        backgroundColor: Colors.white, // Set background color to white
         elevation: 0,
+        // leading: IconButton(
+        //   icon: Icon(Icons.arrow_back, color: Colors.black), // Black back icon
+        //   onPressed: () {
+        //     Navigator.pop(context); // Or your custom back navigation
+        //   },
+        // ),
         title: Center(
           child: Text(
             "CSE FAMILY",

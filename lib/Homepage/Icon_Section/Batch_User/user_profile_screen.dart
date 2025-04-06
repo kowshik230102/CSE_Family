@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../Appbar/Profile/profile_image_widget.dart';
 import '../../Appbar/Profile/user_info_widget.dart';
+
 class UserProfileScreen extends StatelessWidget {
   final String userId;
 
@@ -14,14 +15,24 @@ class UserProfileScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('User Profile'),
+        backgroundColor: Colors.white, // White app bar background
+        elevation: 0, // Remove shadow if desired
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back,
+              color: Colors.black), // Black back icon
+          onPressed: () => Navigator.pop(context),
+        ),
+        title: const Text(
+          'User Profile',
+          style: TextStyle(
+            color: Colors.black, // Black title text
+          ),
+        ),
         centerTitle: true,
       ),
       body: FutureBuilder<DocumentSnapshot>(
-        future: FirebaseFirestore.instance
-            .collection('users')
-            .doc(userId)
-            .get(),
+        future:
+            FirebaseFirestore.instance.collection('users').doc(userId).get(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());

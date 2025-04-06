@@ -44,26 +44,18 @@ class MyApp extends StatelessWidget {
       brightness: Brightness.light,
       primarySwatch: Colors.orange,
       appBarTheme: const AppBarTheme(
-        backgroundColor: Color.fromARGB(255, 237, 251, 251),
+        backgroundColor: Colors.white, // Changed to white
+        elevation: 0,
         titleTextStyle: TextStyle(
-          color: Colors.white,
+          color: Colors.black, // Changed to black
           fontSize: 20,
           fontWeight: FontWeight.bold,
         ),
-        iconTheme: IconThemeData(color: Colors.white),
+        iconTheme: IconThemeData(color: Colors.black), // Changed to black
+        actionsIconTheme:
+            IconThemeData(color: Colors.black), // Changed to black
       ),
-      textTheme: const TextTheme(
-        bodyLarge: TextStyle(color: Colors.black87),
-        bodyMedium: TextStyle(color: Colors.black87),
-      ),
-      cardTheme: CardTheme(
-        color: Colors.white,
-        elevation: 2,
-        margin: const EdgeInsets.all(8),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(10),
-        ),
-      ),
+      // ... rest of your theme ...
     );
   }
 

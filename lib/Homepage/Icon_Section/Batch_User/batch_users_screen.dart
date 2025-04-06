@@ -17,14 +17,25 @@ class BatchUsersScreen extends StatelessWidget {
       create: (_) => BatchUsersController(batchName),
       child: Scaffold(
         appBar: AppBar(
+          backgroundColor: Colors.white, // White app bar background
+          elevation: 0, // Remove shadow if desired
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back,
+                color: Colors.black), // Black back icon
+            onPressed: () => Navigator.pop(context),
+          ),
           title: Text(
             'Batch $batchName',
-            style: const TextStyle(fontWeight: FontWeight.bold),
+            style: const TextStyle(
+              fontWeight: FontWeight.bold,
+              color: Colors.black, // Black text color
+            ),
           ),
           centerTitle: true,
           actions: [
             IconButton(
-              icon: const Icon(Icons.refresh),
+              icon: const Icon(Icons.refresh,
+                  color: Colors.black), // Black refresh icon
               onPressed: () {
                 Provider.of<BatchUsersController>(context, listen: false)
                     .refresh();
