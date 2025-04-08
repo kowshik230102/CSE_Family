@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../Homepage/HomePage.dart';
-import 'signup_page.dart';
 import 'forgot_password_page.dart';
+import 'signup_page.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -239,7 +239,7 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   void navigateToSignUp(BuildContext context) {
-    Navigator.push(
+    Navigator.push( 
         context, MaterialPageRoute(builder: (context) => SignUpPage()));
   }
 }
